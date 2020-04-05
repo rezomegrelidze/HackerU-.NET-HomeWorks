@@ -1,0 +1,127 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace CSharpScratchpad
+{
+    class Program
+    {
+        private const int RowCount = 3, ColumnCount = 4;
+        static void Main(string[] args)
+        {
+            var memoryMatrix = new int[RowCount, ColumnCount];
+            bool[] guessed = new bool[RowCount * ColumnCount / 2 + 1];
+            FillMatrixWithInitialValues(memoryMatrix);
+            ShuffleMatrix(memoryMatrix);
+
+            DrawMemoryGame(memoryMatrix,guessed);
+
+            (int row,int col) prevPosGuessed = (-1,-1);
+
+            while (true)
+            {
+                (int, int) inputPosition;
+                do
+                {
+                    Console.WriteLine("Please enter position of card to open (example: 1,1): ");
+                } while (!TryParsePosition(Console.ReadLine(), out inputPosition));
+
+                if (prevPosGuessed != (-1, -1) &&
+                    GetValueFromPosition(memoryMatrix, prevPosGuessed) == GetValueFromPosition(memoryMatrix, inputPosition))
+                {
+                    guessed[memoryMatrix[prevPosGuessed.row, prevPosGuessed.col]] = true;
+                }
+                Console.Clear();
+                DrawMemoryGame(memoryMatrix,guessed,inputPosition);
+                prevPosGuessed = inputPosition;
+            }
+        }
+
+        private static int GetValueFromPosition(int[,] matrix, (int row, int col) position)
+        {
+            return matrix[position.row, position.col];
+        }
+
+        private static bool TryParsePosition(string input,out (int row,int col) result)
+        {
+            var split = input.Split(',');
+            result = (int.Parse(split[0]) - 1, int.Parse(split[1]) - 1); // return -1 because matricies use indexing from zero
+            return result.row >= 0 && result.row < RowCount && result.col >= 0 && result.col < ColumnCount;
+        }
+
+        private static void DrawMemoryGame(int[,]  memoryMatrix,bool[] guessed,(int,int)? position = null)
+        {
+            for (int row = 0; row < RowCount; row++)
+            {
+                for (int col = 0; col < ColumnCount; col++)
+                {
+                    if (guessed[memoryMatrix[row,col]] || position != null && position == (row, col))
+                    {
+                        Console.Write($"{{{memoryMatrix[row,col]}}}\t");
+                    }
+                    else
+                    {
+                        Console.Write("{ }\t");
+                    }
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        private static void FillMatrixWithInitialValues(int[,] memoryMatrix)
+        {
+
+            int numberOfValues = RowCount * ColumnCount / 2;
+            FillMatrixWithValues(memoryMatrix,Enumerable.Range(1, numberOfValues).SelectMany(x => new[] { x, x }));
+        }
+
+        private static void ShuffleMatrix(int[,] memoryMatrix)
+        {
+            var values = GetMatrixValues(memoryMatrix).ToArray();
+            Random rand = new Random();
+            for (int i = 0; i < values.Length; i++)
+            {
+                int j = rand.Next(i);
+                Swap(values,i,j);
+            }
+
+            FillMatrixWithValues(memoryMatrix, values);
+        }
+
+        private static void Swap(int[] array,int i,int j)
+        {
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+
+        private static IEnumerable<int> GetMatrixValues(int[,] matrix)
+        {
+            foreach (var value in matrix) yield return value;
+        }
+
+
+        private static void FillMatrixWithValues(int[,] memoryMatrix,IEnumerable<int> values)
+        {
+            
+            var allValues = new Queue<int>(values);
+
+            for (int row = 0; row < memoryMatrix.GetLength(0); row++)
+            {
+                for (int col = 0; col < memoryMatrix.GetLength(1); col++)
+                {
+                    memoryMatrix[row, col] = allValues.Dequeue();
+                }
+            }
+        }
+    }
+}
