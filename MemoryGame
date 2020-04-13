@@ -56,7 +56,8 @@ namespace MemoryGame
         private static void StartMemoryGame<T>(IEnumerable<T> initialValues)
         {
             var memoryMatrix = new T[RowCount, ColumnCount];
-            Dictionary<T, bool> guessed = InitializeGuessDictionary(initialValues);
+            var guessed = GenerateGuessDictionary(initialValues);
+
 
             FillMatrixWithInitialValues(memoryMatrix, initialValues);
             ShuffleMatrix(memoryMatrix);
@@ -87,23 +88,14 @@ namespace MemoryGame
             Console.WriteLine("End of game. Have a nice day!!");
         }
 
-        private static Dictionary<T, bool> InitializeGuessDictionary<T>(IEnumerable<T> initialValues)
-        {
-            var guessed = new Dictionary<T, bool>();
+        private static Dictionary<T, bool> GenerateGuessDictionary<T>(IEnumerable<T> initialValues)
+            => initialValues.Zip(Enumerable.Repeat(false, initialValues.Count()), ((key, value) => (key, value)))
+                .ToDictionary(t => t.key, t => t.value);
 
-            foreach (var value in initialValues) guessed[value] = false;
-            return guessed;
-        }
+        private static bool BoardFull<T>(Dictionary<T,bool> guessed,IEnumerable<T> allValues) 
+            => allValues.All(value => guessed[value]);
 
-        private static bool BoardFull<T>(Dictionary<T,bool> guessed,IEnumerable<T> allValues)
-        {
-            return allValues.All(value => guessed[value]);
-        }
-
-        private static T GetValueFromPosition<T>(T[,] matrix, (int row, int col) position)
-        {
-            return matrix[position.row, position.col];
-        }
+        private static T GetValueFromPosition<T>(T[,] matrix, (int row, int col) position) => matrix[position.row, position.col];
 
         private static bool TryParsePosition(string input, out (int row, int col) result)
         {
@@ -138,10 +130,8 @@ namespace MemoryGame
             }
         }
 
-        private static void FillMatrixWithInitialValues<T>(T[,] memoryMatrix,IEnumerable<T> initialValues)
-        {
+        private static void FillMatrixWithInitialValues<T>(T[,] memoryMatrix,IEnumerable<T> initialValues) => 
             FillMatrixWithValues(memoryMatrix, initialValues.SelectMany(x => new[] { x, x }));
-        }
 
         private static void ShuffleMatrix<T>(T[,] memoryMatrix)
         {
@@ -156,10 +146,8 @@ namespace MemoryGame
             FillMatrixWithValues(memoryMatrix, values);
         }
 
-        private static void Swap<T>(T[] array, int i, int j)
-        {
-            (array[i], array[j]) = (array[j], array[i]);
-        }
+        private static void Swap<T>(T[] array, int i, int j) 
+            => (array[i], array[j]) = (array[j], array[i]);
 
 
         private static void FillMatrixWithValues<T>(T[,] memoryMatrix, IEnumerable<T> values)
