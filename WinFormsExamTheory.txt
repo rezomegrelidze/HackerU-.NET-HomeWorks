@@ -1,0 +1,127 @@
+1. What is the newer platform for windows forms in .NET ?
+ A: Windows Presentation Foundation (WPF). It includes much better graphics system based on DirectX advantages
+    also supports a Markup language called XAML that makes scalable UI development much easier.
+    Developers using WPF mostly us it with the MVVM (Model View ViewModel) pattern. Which makes code behinds 
+    irrelevant and really seperates UI logic from business logic.
+
+2. What is the advantages of winform over other platforms?
+   A. It's really beginner friendly. It includes a lot of built in controls. In fact a lot more than WPF has. 
+      of course you can download third party controls for WPF but the beauty in WinForms is that it's all already in.
+      And also winforms has a really elegant graphics API (System.Drawing). And actually for simple programs that
+      don't need to have really complex UI probably are better done with WinForms.
+
+3. What are the problems with a single drawing worker?
+   A. CPU intensive tasks will freeze the UI and after couple of seconds will cause Window not responding.
+
+4. How did we solve the problem of a single drawing worker?
+   A. You need to run any cpu intesnive task on a different thread. You can create a new thread or get a thread
+      from the thread pool. In .NET you can use a number of different types. Task, ThreadPool or good old Threads.
+
+5. How do you create new workers? Give example
+   A. Probably the simplest example would be:
+
+            Task.Run(() => {
+                // cpu intensive code goes here
+            });
+
+
+6. How do we ask the drawing worker to perform a drawing task for us?
+    control.BeginInvoke((MethodInvoker) delegate
+                {
+                    // ui code goes here
+                });
+
+7. Where and how do we print debug messages in winform (since there is no console)
+    A. Trace.WriteLine(message);
+
+8. What is the difference between Properties and Events?
+    Properties are data members of an object. The purpose of events is to give a mechanism to signal change.
+9. What’s the difference between listbox and combo box?
+    A. Listbox is a list of items and also you can have multiple currently selected items.
+       Combobox is a list of items but you can only have one selected at a time, and also only one is displayed
+       until you open it.
+
+10. How can we add an open-file-dialog to our project? also demonstrate in code
+    A. In any codebehind method you can just use the OpenFileDialog type:
+
+    Example use:
+        var ofd = new OpenFileDialog();
+        ofd.ShowDialog();
+        var file = ofd.FileName;
+
+11. How can we add a menu to our project? also demonstrate in code
+
+    A. Using the MenuStrip control.
+        Example code behind:
+            for (int i = 0; i < 10; i++)
+            {
+                menuStrip1.Items.Add(new ToolStripMenuItem($"menu item {i}"));
+            }
+
+
+12. Create a Message box with a yes , no buttons, and an Error icon
+    A. 
+        MessageBox.Show("Sample Text",
+                        "MessageBox Title",
+                         MessageBoxButtons.YesNo, 
+                         MessageBoxIcon.Error);
+
+13. What’s the difference between checkbox and radio button?
+    A. In a checkbox you can select multiple options in a radio button only one option can be selected at a time.
+
+14. What the purpose of the designer.cs file?
+    A. In a winforms the form class is usually a partial class that has the Form.cs and Form.designer.cs file.
+       When one drags and drops controls on the form every control gets instantiated and their properties changed
+       in the designer.cs partial class. It's main purpose is not to clutter the code behind Form.cs class.
+
+15. Does winform also has static void main ? if so, what is its purpose?
+    A. It's the entrypoint of the application. That's where the method Application.Run gets called which takes
+    as an argument the main application form. And the main method also has a STAThread attribute which indicates
+    that it's a Single Threaded Apartment which is a requirement to communicate with COM components.
+    
+16. Why is it important to give names to our components?
+    A. It makes your code more readable and makes it easier to reference it in the code behind.
+       But if you don't name your controls they will get a default name like textBox1, Button1 etc.
+
+17. How do we mark a resource (i.e. photo) to be copied to the runtime folder?
+    A. You have an option in the properties of the resources to change whether it copies the resources
+       to the output directory of not. the options are: Do not copy, Copy if newer, Copy always.
+18. What is a Timer? When can we use it? also demonstrate in code
+    A. A time gives us a mechanism to execute code at a give time interval.
+
+        Code Example:
+            Timer timer = new Timer();
+            timer.Interval = 1000; // execute the code every second
+            timer.Tick += (o, args) =>
+            {
+                // code goes here
+            };
+            timer.Start();        // start the timer
+
+
+19. How do we make a variable become global to our form?
+    A.
+        You make it a field in the form 
+        Like this: 
+        class Form1 : Form {
+            private object myField;
+
+            ......
+        }
+
+20. What is the purpose of const variables? Give an example?
+    A.
+        It's good for compiled time constants. Like versionName, productName, apiKey etc..
+
+21. In the Keydown event, how can we detect which key was pressed?
+
+    A.
+        for example if we wanted to test if enter was pressed:
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                // Code goes here
+            }
+        }
