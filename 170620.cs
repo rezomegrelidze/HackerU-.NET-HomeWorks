@@ -19,7 +19,7 @@ namespace DotNETScratchpad
      *      Lifetime of that object.
      *
      *      Question 3: How to create an object with C#?
-     *      Answer: you can do it using the new Keyword (Although when can also use factory creation methods that a given
+     *      Answer: you can do it using the new Keyword (Although one can also use factory creation methods that a given
      *      class may contain). A typical example would be: var p = new Person { Name = "Raz", Age = 24 }; 
      *      Which uses object initializer syntactic sugar.
      *
